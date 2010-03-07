@@ -30,17 +30,21 @@ digits 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9?
 
 def next_number(digits):
     #~ digits = map(lambda x: int(x), str(number))
-    move_this = digits.pop()
-    for n in range(len(digits) - 1, -1, -1):
-        if move_this > digits[n]:
-            digits.insert(n, move_this)
-            break
+    #~ move_this = digits.pop()
+    for check_index in range(len(digits) - 1, -1, -1):
+        for n in range(len(digits) - 1, -1, -1):
+            check_value = digits[check_index]
+            if check_value > digits[n]:
+                digits.remove(check_value)
+                digits.insert(n, check_value)
+                return digits
 
-    return digits
+    raise Exception("no more numbers")
+    #~ return digits
 
 
 
-current = [0, 1, 2]
+current = [0, 1, 2, 3]
 for n in range(5):
     print current
     current = next_number(current)
