@@ -50,23 +50,18 @@ sum = 0
 primes = []
 progress = ProgressBar(2000000)
 
-#~ for n in range(2, 2000000):
-for n in range(2, progress.max):
+for n in xrange(2, progress.max):
     progress.set_value(n)
-    break_out = False
 
-    if break_out:
-        continue
-
-    #~ if is_prime(n, primes):
-    if is_prime(n):
+    if is_prime(n, primes):
         sum += n
         primes.append(n)
 
+end_time = datetime.now()
 progress.finished()
 print "sum: %s" % sum
-end_time = datetime.now()
-#~ print primes
+print "number of primes: %s" % len(primes)
 print end_time - start_time
 
 #2,000,000: 142913828922
+
