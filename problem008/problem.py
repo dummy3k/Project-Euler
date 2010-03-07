@@ -27,15 +27,21 @@ number_block = """
 """.replace('\n', '')
 print len(number_block)
 
-greatest_numbers = []
+greatest = 0
 
 for n in range(len(number_block) - 4):
-    number = number_block[n:n + 5]
-    #~ print number
-    greatest_numbers.append(int(number))
+    numbers = number_block[n:n + 5]
+    product = int(numbers[0]) * int(numbers[1]) * int(numbers[2]) * int(numbers[3]) * int(numbers[4])
+    print "%s * %s * %s * %s * %s = %s" % (numbers[0],
+                                           numbers[1],
+                                           numbers[2],
+                                           numbers[3],
+                                           numbers[4],
+                                           product)
 
-greatest_numbers.sort()
-greatest_numbers.reverse()
-top5 = greatest_numbers[:5]
-print top5
-print top5[0] * top5[1] * top5[2] * top5[3] * top5[4]
+    if product > greatest:
+        greatest = product
+
+
+print "greatest: %s" % greatest
+
