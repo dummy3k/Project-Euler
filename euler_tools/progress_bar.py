@@ -28,6 +28,9 @@ class ProgressBar():
             sys.stdout.flush()
             self.last_update = datetime.now()
 
+    def clear(self):
+        print "\r" + " " * self.tty_width + "\r",
+
     def finished(self):
         msg = "\rFinished"
         while len(msg) - 1 < self.tty_width:
