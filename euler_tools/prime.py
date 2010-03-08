@@ -1,6 +1,9 @@
 import math
 
 def is_prime(number, primes=None):
+    if number < 2:
+        return False
+
     start_at = 2
 
     #~ if reduce(lambda x, y: x or (number % y == 0), primes, False):
