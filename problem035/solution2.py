@@ -9,10 +9,62 @@ if __name__ == "__main__":
 
 from datetime import datetime
 from copy import copy
+from threading import Thread
 
 from euler_tools.prime import is_prime
 from euler_tools.progress_bar import ProgressBar
 from euler_tools.misc import is_palindrome
+
+class PrimeGeneratorManager():
+    def __init__(self):
+        self.primes = []
+        self.current = 2
+        self.my_threads = []
+
+    def next(self):
+        if not self.current:
+            self.current = 2
+        else:
+            tmp = self.current + 1
+            while not is_prime(tmp, self.primes):
+                tmp += 1
+
+        self.primes.append = [self.current]
+        return self.current
+
+    def agent_finished(self, agent):
+        self.primes.extend(agent.retval)
+        self.start_agent()
+
+    def start_agent(self):
+        print "Starting agent"
+        t = PrimeGeneratorAgent(self.current, self.current + 100000, self)
+        t.start()
+        self.my_threads.append(t)
+
+
+
+
+class PrimeGeneratorAgent(Thread):
+    def __init__(self, min_value, max_value, manager):
+        Thread.__init__(self)
+        self.primes = copy(manager.primes)
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def run(self):
+        self.retval = []
+        for n in range(self.min_value, self.max_value + 1):
+            if is_prime(n):
+                #~ print "Found prime: %s" % n
+                self.retval.append(n)
+
+
+        #~ self.primes.append = [self.current]
+        #~ return self.current
+
+
+
 
 def find_solution():
     start_time = datetime.now()
@@ -57,28 +109,20 @@ def rotate(input):
 
     return retval
 
-find_solution()
+#~ find_solution()
 
-#~ n = 197
-#~ print rotate(123456)
+m = PrimeGeneratorManager()
+#~ my_threads = []
+for n in range(3):
+    m.start_agent()
+    #~ t = PrimeGeneratorAgent(1000000 * n, 1000000 * (n + 1), m)
+    #~ t.start()
+    #~ my_threads.append(t)
 
+#~ for item in m.my_threads:
+for item in m:
+    print "Wait..."
+    item.join()
 
-#~ def print_x(x):
-    #~ print x
-#~
-#~ print permutate(digits, [], lambda x: x)
-
-#~ permutate(digits, [], raise_if_not_prime)
-#~ try:
-    #~ permutate(digits, [], raise_if_not_prime)
-    #~ print "Is Prime!"
-#~ except IsNotPrimeError:
-    #~ print "Is NO Prime!"
-
-
-
-
-
-#~ answer: 22
-#~ 0:07:00.911644
-
+#~ answer: 55
+#~ 0:00:26.071487
