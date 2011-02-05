@@ -1,3 +1,5 @@
+import datetime
+
 def is_palindrome(x):
     x_str = str(x)
     for n in range(len(x_str) / 2):
@@ -26,3 +28,15 @@ def ipython():
         exit_msg = 'Leaving Interpreter, back to Pylons.')
     return ipshell
 
+class LossyPrinter():
+    def __init__(self, intervall):
+        self.intervall = intervall
+        self.ts = None
+
+    def try_print(self, s):
+        if self.ts == None:
+            self.ts = datetime.datetime.now()
+            print s
+        elif (datetime.datetime.now() - self.ts).seconds > self.intervall:
+            self.ts = datetime.datetime.now()
+            print s
