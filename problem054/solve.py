@@ -300,11 +300,43 @@ def is_three_of_a_kind(hand):
     return ThreeOfKindResult(three_cards, hand)
 
 
+
+class KickerBasedResult(ResultBase):
+    def __init__(self, kickers, rank):
+        ResultBase.__init__(self, rank)
+        self.kickers = sorted(kickers, cmp_cards_color)
+        self.kickers.reverse()
+
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__, self.kickers)
+
+
+    def __cmp_rank__(self, other):
+        for pair in zip(self.kickers, other.kickers):
+            r = cmp_cards(pair[0], pair[1])
+            if r == 0:
+                continue
+            return r
+
+        return 0
+
+class StraightResult(KickerBasedResult):
+    def __init__(self, kickers):
+        KickerBasedResult.__init__(self, kickers, ResultBase.STRAIGHT)
+
+
 def is_straight(hand):
     """
-        x>>>is_straight(['KH', 'QS', '9D', 'TC', 'JS'])
+        >>> is_straight(['KH', 'QS', '9D', 'TC', 'JS'])
         StraightResult(['KH', 'QS', 'JS', 'TC', '9D'])
     """
+    kickers = sorted(hand, cmp_cards)
+    for index in range(0, len(hand) - 1):
+        if cmp_cards(kickers[index], kickers[index + 1]) > -1:
+            return None
+
+    return StraightResult(kickers)
+
 
 
 def parse_hands(line):
@@ -322,6 +354,10 @@ def get_result(cards):
         >>> get_result(['5C', '5S', '3C', '3S', '7H'])
         TwoPairResult(('5C', '5S'), ('3C', '3S'), '7H')
     """
+    retval = is_straight(cards)
+    if retval:
+        return retval
+
     retval = is_three_of_a_kind(cards)
     if retval:
         return retval
@@ -357,8 +393,8 @@ if __name__ == "__main__":
                 if result_one == result_two:
                     print "!!! %s = %s" % (result_one, result_two)
 
-                if  result_one.rank == ResultBase.THREE_OF_A_KIND or\
-                    result_two.rank == ResultBase.THREE_OF_A_KIND:
+                if  result_one.rank == ResultBase.STRAIGHT or\
+                    result_two.rank == ResultBase.STRAIGHT:
 
                     if result_one > result_two:
                         print "%s > %s" % (result_one, result_two)
