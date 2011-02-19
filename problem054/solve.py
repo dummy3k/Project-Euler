@@ -190,17 +190,122 @@ def is_two_pair(hand):
         TwoPairResult(('5C', '5S'), ('3C', '3S'), '7H')
 
         >>> is_two_pair(['5C', '5S', '3C', '4S', '7H'])
-        (None, None, None)
+
+        Note that the above call has None as result
     """
     first_pair, hand = find_pair(hand)
     if not first_pair:
-        return (None, None, None)
+        return None
 
     second_pair, hand = find_pair(hand)
     if not second_pair:
-        return (None, None, None)
+        return None
 
     return TwoPairResult(first_pair, second_pair, hand[0])
+
+def is_one_pair(hand):
+    """
+        >>> is_one_pair(['5C', '5S', '4C', '3S', '7H'])
+        OnePairResult(('5C', '5S'), ['7H', '4C', '3S'])
+
+        x>>> is_two_pair(['5C', '5S', '3C', '4S', '7H'])
+
+        Note that the above call has None as result
+    """
+    first_pair, hand = find_pair(hand)
+    if not first_pair:
+        return None
+
+    second_pair, hand = find_pair(hand)
+    if second_pair:
+        raise NotImplementedError('is_one_pair got twopair')
+        return None
+
+    return OnePairResult(first_pair, hand)
+
+class ThreeOfKindResult(ResultBase):
+    def __init__(self, pair, kickers):
+        ResultBase.__init__(self, ResultBase.THREE_OF_A_KIND)
+        self.pair = pair
+        self.kickers = sorted(kickers, cmp_cards_color)
+        self.kickers.reverse()
+
+    def __repr__(self):
+        """
+            >>> ThreeOfKindResult(('5C', '5S', '5H'), ['3S', '7H'])
+            ThreeOfKindResult(('5C', '5S', '5H'), ['7H', '3S'])
+        """
+        return "ThreeOfKindResult(%s, %s)" % (self.pair, self.kickers)
+
+
+    def __cmp_rank__(self, other):
+        """
+            >>> first = ThreeOfKindResult(('5C', '5S', '5H'), ['3S', '7H'])
+            >>> first > ThreeOfKindResult(('5C', '5S', '5H'), ['3S', '6H'])
+            True
+            >>> first > ThreeOfKindResult(('4C', '4S', '4H'), ['3S', '7H'])
+            True
+        """
+        if self.pair[0][0] > other.pair[0][0]:
+            return 1
+        elif self.pair[0][0] < other.pair[0][0]:
+            return -1
+        else:
+            for pair in zip(self.kickers, other.kickers):
+                r = cmp_cards(pair[0], pair[1])
+                if r == 0:
+                    continue
+                return r
+
+            return 0
+
+        raise Exception("not implemented")
+
+
+def find_three(hand):
+    """ Find the next pair in the hand
+
+        >>> find_three(['5C', '5S', '3S', '5H', '7H'])
+        (('5C', '5S', '5H'), ['3S', '7H'])
+    """
+    hand = copy.copy(hand)
+    for a in range(len(hand)):
+        for b in range(a + 1, len(hand)):
+            if hand[a][0] == hand[b][0]:
+                for c in range(b + 1, len(hand)):
+                    if hand[a][0] == hand[c][0]:
+                        first_card = hand[a]
+                        second_card = hand[b]
+                        third_card = hand[c]
+                        hand.remove(first_card)
+                        hand.remove(second_card)
+                        hand.remove(third_card)
+                        return ((first_card, second_card, third_card), hand)
+
+    return (None, hand)
+
+def is_three_of_a_kind(hand):
+    """
+        >>> is_three_of_a_kind(['5C', '5S', '3S', '5H', '7H'])
+        ThreeOfKindResult(('5C', '5S', '5H'), ['7H', '3S'])
+
+        >>> is_three_of_a_kind(['5C', '5S', '3C', '4S', '7H'])
+
+        Note that the above call has None as result
+    """
+    three_cards, hand = find_three(hand)
+    if not three_cards:
+        return None
+
+    return ThreeOfKindResult(three_cards, hand)
+
+
+def is_straight(hand):
+    """
+        x>>>is_straight(['KH', 'QS', '9D', 'TC', 'JS'])
+        StraightResult(['KH', 'QS', 'JS', 'TC', '9D'])
+    """
+
 
 def parse_hands(line):
     """ parse one line from poker.txt
@@ -217,7 +322,19 @@ def get_result(cards):
         >>> get_result(['5C', '5S', '3C', '3S', '7H'])
         TwoPairResult(('5C', '5S'), ('3C', '3S'), '7H')
     """
-    return is_two_pair(cards)
+    retval = is_three_of_a_kind(cards)
+    if retval:
+        return retval
+
+    retval = is_two_pair(cards)
+    if retval:
+        return retval
+
+    retval = is_one_pair(cards)
+    if retval:
+        return retval
+
+    raise NotImplementedError()
 
 if __name__ == "__main__":
     import doctest
@@ -233,9 +350,26 @@ if __name__ == "__main__":
                 break
 
             hands = parse_hands(line)
-            #~ print hands(0)
-            first_pair, second_pair, kicker = is_two_pair(hands[0])
-            if first_pair:
-                print hands[0]
+            try:
+                result_one = get_result(hands[0])
+                result_two = get_result(hands[1])
+
+                if result_one == result_two:
+                    print "!!! %s = %s" % (result_one, result_two)
+
+                if  result_one.rank == ResultBase.THREE_OF_A_KIND or\
+                    result_two.rank == ResultBase.THREE_OF_A_KIND:
+
+                    if result_one > result_two:
+                        print "%s > %s" % (result_one, result_two)
+                    elif result_one < result_two:
+                        print "%s < %s" % (result_one, result_two)
+                    else:
+                        print "%s = %s" % (result_one, result_two)
+
+            except NotImplementedError:
+                #~ print "%s   %s" % hands
+                pass
+
 
         f.close()
