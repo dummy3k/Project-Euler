@@ -40,3 +40,20 @@ class LossyPrinter():
         elif (datetime.datetime.now() - self.ts).seconds > self.intervall:
             self.ts = datetime.datetime.now()
             print s
+
+def fib(max=None):
+    alpha = 1
+    yield alpha
+
+    beta = 1
+    yield beta
+
+    while True:
+        tmp = alpha + beta
+        alpha = beta
+        beta = tmp
+        if max and beta > max:
+            return
+
+        yield beta
+
