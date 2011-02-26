@@ -31,15 +31,14 @@ def ipython():
 class LossyPrinter():
     def __init__(self, intervall):
         self.intervall = intervall
-        self.ts = None
+        self.ts = datetime.datetime.now()
+        self.ts_start = datetime.datetime.now()
 
     def try_print(self, s):
-        if self.ts == None:
+        if (datetime.datetime.now() - self.ts).seconds > self.intervall:
             self.ts = datetime.datetime.now()
-            print s
-        elif (datetime.datetime.now() - self.ts).seconds > self.intervall:
-            self.ts = datetime.datetime.now()
-            print s
+            delta = datetime.datetime.now() - self.ts_start
+            print "[%02i:%02i] %s" % (delta.seconds / 60, delta.seconds % 60, s)
 
 def fib(max=None):
     alpha = 1
