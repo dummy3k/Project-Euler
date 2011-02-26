@@ -237,8 +237,10 @@ def pprint_array(a, rows = 3):
 
 def solve4(peter_head_cnt, peter_dice_cnt, colin_head_cnt, colin_dice_cnt):
     answer = 0
-    peters_dices_all = permutate_unique(range(1, peter_head_cnt + 1), peter_dice_cnt)
-    colins_dices_all = permutate_unique(range(1, colin_head_cnt + 1), colin_dice_cnt)
+    #~ peters_dices_all = permutate_unique(range(1, peter_head_cnt + 1), peter_dice_cnt)
+    #~ colins_dices_all = permutate_unique(range(1, colin_head_cnt + 1), colin_dice_cnt)
+    peters_dices_all = permutate(range(1, peter_head_cnt + 1), peter_dice_cnt)
+    colins_dices_all = permutate(range(1, colin_head_cnt + 1), colin_dice_cnt)
 
     pprint_array(peters_dices_all, 8)
     pprint_array(colins_dices_all, 8)
@@ -260,35 +262,6 @@ def solve4(peter_head_cnt, peter_dice_cnt, colin_head_cnt, colin_dice_cnt):
         print "INCORRECT (should be ~%s)" % guess
 
     return answer
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
-
-    #~ solve4(2, 1, 2, 1)
-    peter_head_cnt = 4
-    peter_dice_cnt = 9
-    colin_head_cnt = 6
-    colin_dice_cnt = 6
-
-    if '-2' in sys.argv:
-        guess = solve2(peter_head_cnt, peter_dice_cnt, colin_head_cnt, colin_dice_cnt)
-    else:
-        guess = None
-
-    if '-4' in sys.argv:
-        answer = solve4(peter_head_cnt, peter_dice_cnt, colin_head_cnt, colin_dice_cnt)
-        if guess:
-            delta = abs(answer - guess)
-            print "delta: %s" % delta
-
-    #~ pprint(permutate_unique(range(1, 7), 6))
-    #~ pprint(permutate_unique(range(1, 5), 9))
-
-    #~ print len(permutate_unique(range(1, 7), 6))
-    #~ print len(permutate_unique(range(1, 5), 9))
-
-    #~ solve2()
 
 
 def solve5():
@@ -319,3 +292,28 @@ def solve5():
     #~ print "%s, %s" % (len(peters_results), len(colins_results))
     #~ pprint(zip(peters_results, colins_results))
 
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+
+    #~ solve4(2, 1, 2, 1)
+    peter_head_cnt = 4
+    peter_dice_cnt = 9
+    colin_head_cnt = 6
+    colin_dice_cnt = 6
+
+    if '-2' in sys.argv:
+        guess = solve2(peter_head_cnt, peter_dice_cnt, colin_head_cnt, colin_dice_cnt)
+    else:
+        guess = None
+
+    if '-4' in sys.argv:
+        answer = solve4(peter_head_cnt, peter_dice_cnt, colin_head_cnt, colin_dice_cnt)
+        if guess:
+            delta = abs(answer - guess)
+            print "delta: %s" % delta
+
+
+    if '-5' in sys.argv:
+        solve5()
