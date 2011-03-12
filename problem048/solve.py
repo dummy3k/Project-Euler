@@ -61,10 +61,11 @@ def test_pool():
     from euler_tools.misc import StopWatch
     watch = StopWatch()
 
+    max_n = 300
     import multiprocessing
     count = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=count)
-    answers = pool.map(work, range(1000))
+    answers = pool.map(work, range(max_n))
 
     answer = 0
     for item in answers:
