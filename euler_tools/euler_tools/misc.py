@@ -71,3 +71,9 @@ def fib(max=None):
 
         yield beta
 
+def find(fn, sequence):
+    for item in sequence:
+        if fn(item):
+            return item
+
+    raise Exception("no match")
