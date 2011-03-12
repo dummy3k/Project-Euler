@@ -40,6 +40,21 @@ class LossyPrinter():
             delta = datetime.datetime.now() - self.ts_start
             print "[%02i:%02i] %s" % (delta.seconds / 60, delta.seconds % 60, s)
 
+class StopWatch():
+    def __init__(self):
+        self.ts_start = datetime.datetime.now()
+        self.ts_end = None
+
+    def stop(self):
+        self.ts_end = datetime.datetime.now()
+
+    def print_time(self):
+        if not self.ts_end:
+            self.stop()
+
+        delta = self.ts_end - self.ts_start
+        print "Runtime:  %02i:%02i" % (delta.seconds / 60, delta.seconds % 60)
+
 def fib(max=None):
     alpha = 1
     yield alpha
