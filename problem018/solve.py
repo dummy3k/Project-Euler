@@ -2,7 +2,8 @@ from pprint import pprint
 
 triangle = []
 
-f = open('triangle_18.txt')
+#~ f = open('triangle_18.txt')
+f = open('triangle_67.txt')
 while True:
     line = f.readline()
     if line == "":
