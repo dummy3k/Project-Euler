@@ -4,6 +4,9 @@ def is_prime(number, primes=None):
     if number < 2:
         return False
 
+    if number in primes:
+        return True
+
     start_at = 2
 
     #~ if reduce(lambda x, y: x or (number % y == 0), primes, False):
@@ -30,4 +33,21 @@ def is_prime(number, primes=None):
         if number % divisor == 0:
             return False
 
+    #~ print "adding: %s" % number
+    primes.append(number)
     return True
+
+def gen_primes(max, primes):
+    #~ n = 2
+    for n in primes:
+        if n > max:
+            return
+        yield n
+
+    if n % 2 != 0:
+        n += 1
+
+    for m in xrange(n + 1, max, 2):
+        #~ print "testing: %s" % m
+        if is_prime(m, primes):
+            yield m

@@ -1,4 +1,6 @@
-python -m timeit -s "import problem081.solve" "problem081.solve.calc(70, 70)"
+python -m timeit -s "import problem023.solve" "problem023.solve.is_abundant_naive(28123)"
+
+#~ python -m timeit -s "import problem081.solve" "problem081.solve.calc(70, 70)"
 #~ python -m timeit -n 3 -r 2 -s "import problem012.solve" "problem012.solve.anzahl_teiler(5464565)"
 #~ python -m timeit -n 100 -r 2 -s "import problem012.solve" "problem012.solve.anzahl_teiler4(5464565)"
 #~ python -m timeit -n 10 -r 2 -s "import problem012.solve" "problem012.solve.anzahl_teiler(5464565)"
