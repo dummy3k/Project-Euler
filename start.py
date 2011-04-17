@@ -1,5 +1,5 @@
-import problem205.solve
-problem205.solve.solve()
+#~ import problem205.solve
+#~ problem205.solve.solve()
 
 #~ import problem005.solve
 #~ problem005.solve.solve()

@@ -4,7 +4,7 @@ def is_prime(number, primes=None):
     if number < 2:
         return False
 
-    if number in primes:
+    if primes and number in primes:
         return True
 
     start_at = 2
@@ -34,7 +34,8 @@ def is_prime(number, primes=None):
             return False
 
     #~ print "adding: %s" % number
-    primes.append(number)
+    if primes:
+        primes.append(number)
     return True
 
 def gen_primes(max, primes):

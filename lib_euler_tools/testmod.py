@@ -1,2 +1,2 @@
-def blah()
+def blah():
     pass
