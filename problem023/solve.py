@@ -24,9 +24,11 @@ def is_abundant_naive(n):
         True
     """
     sum = 0
-    for m in xrange(1, n / 2 + 1):
+    for m in xrange(2, int(math.sqrt(n)) + 1):
         if n % m == 0:
             sum += m
+            if m < n / m:
+                sum += n / m
             if sum > n:
                 return True
 
@@ -140,25 +142,30 @@ def main():
     total_watch = StopWatch()
 
     cpu_count = multiprocessing.cpu_count()
-    pool = multiprocessing.Pool(processes=cpu_count)
-    work_units = divide_array(range(max_n), cpu_count * 10)
-
-    watch = StopWatch()
-    map_results = pool.map(find_abundant_numbers, work_units)
-    watch.print_time("Map")
-
-    watch = StopWatch()
+    #~ pool = multiprocessing.Pool(processes=cpu_count)
+    #~ work_units = divide_array(range(max_n), cpu_count * 10)
+#~
+    #~ watch = StopWatch()
+    #~ map_results = pool.map(find_abundant_numbers, work_units)
+    #~ watch.print_time("Map")
+#~
+    #~ watch = StopWatch()
     abundant_numbers = []
-    for item in map_results:
-        abundant_numbers.extend(item)
-    abundant_numbers = sorted(abundant_numbers)
-    watch.print_time("Reduce")
+    for n in xrange(max_n):
+        if is_abundant_naive(n):
+            abundant_numbers.append(n)
+
+    #~ for item in map_results:
+        #~ abundant_numbers.extend(item)
+    #~ abundant_numbers = sorted(abundant_numbers)
+    #~ watch.print_time("Reduce")
 
     #~ len(abundant_numbers): 6965
     print "len(abundant_numbers): %s"  % len(abundant_numbers)
     if len(abundant_numbers) < 100:
         print abundant_numbers
 
+    #~ return
 
     pool = multiprocessing.Pool(processes=cpu_count)
     work_units = [(abundant_numbers, n) for n in divide_array(range(max_n), cpu_count * 2)]
