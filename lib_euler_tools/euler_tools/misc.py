@@ -48,12 +48,15 @@ class StopWatch():
     def stop(self):
         self.ts_end = datetime.datetime.now()
 
-    def print_time(self):
+    def print_time(self, msg=None):
         if not self.ts_end:
             self.stop()
 
         delta = self.ts_end - self.ts_start
-        print "Runtime:  %02i:%02i" % (delta.seconds / 60, delta.seconds % 60)
+        if msg:
+            print "Runtime:  %02i:%02i (%s)" % (delta.seconds / 60, delta.seconds % 60, msg)
+        else:
+            print "Runtime:  %02i:%02i" % (delta.seconds / 60, delta.seconds % 60)
 
 def fib(max=None):
     alpha = 1

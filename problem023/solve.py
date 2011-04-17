@@ -1,33 +1,12 @@
 import doctest
+import multiprocessing
+import math
+
 from euler_tools.misc import StopWatch, LossyPrinter
 from euler_tools.prime import is_prime, gen_primes
 
 primes = [2]
 max_n = 28123
-#~ max_n = 100
-
-def is_abundant_prime(n):
-    """
-        #>>> is_abundant_prime(2)
-        #False
-        #>>> is_abundant_prime(6)
-        #False
-        #>>> is_abundant_prime(6)
-        #False
-        x>>> is_abundant_prime(12)
-        True
-    """
-    #~ sum = 0
-    #~ for m in xrange(1, n):
-    sum = 1
-    for m in gen_primes(n - 1, primes):
-        if n % m == 0:
-            print "m: %s" % m
-            sum += m
-            if sum > n:
-                return True
-
-    return (sum > n)
 
 def is_abundant_naive(n):
     """
@@ -91,8 +70,6 @@ def divide_conquer(n, sumand_1, abundant_numbers, left, right, depth):
 
     pivot_index = left + (right - left) / 2
     try:
-        #~ if pivot_index < 0 or pivot_index:
-            #~ return False
         pivot_value = abundant_numbers[pivot_index]
     except IndexError:
         raise IndexError("idx: %s, len: %s, left: %s, right: %s" % (pivot_index, len(abundant_numbers), left, right))
@@ -102,7 +79,6 @@ def divide_conquer(n, sumand_1, abundant_numbers, left, right, depth):
         return True
 
     if right - left == 1:
-        #~ print "%sbvlagh" % di
         return False
 
     if sumand_1 + pivot_value > n:
@@ -112,41 +88,94 @@ def divide_conquer(n, sumand_1, abundant_numbers, left, right, depth):
         #~ print "  go right"
         return divide_conquer(n, sumand_1, abundant_numbers, pivot_index, right, depth + 1)
 
+
+def divide_array(the_array, count):
+    """
+        >>> divide_array(range(10), 3)
+        [[0, 1, 2], [3, 4, 5], [6, 7, 8, 9]]
+
+        >>> divide_array(range(11), 3)
+        [[0, 1, 2], [3, 4, 5], [6, 7, 8, 9, 10]]
+
+        >>> divide_array(range(12), 3)
+        [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+    """
+    retval = []
+    slice_size = len(the_array) / count
+    for n in range(count):
+        retval.append(the_array[n * slice_size: (n + 1) * slice_size])
+
+    rest = len(the_array) % count
+    if rest != 0:
+        retval[-1].extend(the_array[-rest:])
+    return retval
+
+def find_abundant_numbers(work_unit):
+    """
+        this is supposed to called from multiprocessing
+    """
+    print "find_abundant_numbers(%s..%s), start" % (work_unit[0], work_unit[-1])
+    retval = []
+    for n in work_unit:
+        if is_abundant_naive(n):
+            retval.append(n)
+    #~ print "find_abundant_numbers(%s..%s), stop" % (work_unit[0], work_unit[-1])
+    return retval
+
+def find_sumands(work_unit):
+    """
+        this is supposed to called from multiprocessing
+    """
+    print "find_sumands(%s..%s), start" % (work_unit[1][0], work_unit[1][-1])
+    sum = 0
+    abundant_numbers = work_unit[0]
+    for n in work_unit[1]:
+        #~ lp.try_print("n: %s" % n)
+        if not is_sum_of_abundant_numbers(n, abundant_numbers):
+           sum += n
+    return sum
+
 def main():
     lp = LossyPrinter(1)
+    total_watch = StopWatch()
 
-    #~ max_n = 5000
+    cpu_count = multiprocessing.cpu_count()
+    pool = multiprocessing.Pool(processes=cpu_count)
+    work_units = divide_array(range(max_n), cpu_count * 10)
+
+    watch = StopWatch()
+    map_results = pool.map(find_abundant_numbers, work_units)
+    watch.print_time("Map")
+
+    watch = StopWatch()
     abundant_numbers = []
-    for n in range(max_n):
-        lp.try_print(n)
-        if is_abundant_naive(n):
-            abundant_numbers.append(n)
+    for item in map_results:
+        abundant_numbers.extend(item)
+    abundant_numbers = sorted(abundant_numbers)
+    watch.print_time("Reduce")
 
     #~ len(abundant_numbers): 6965
-
     print "len(abundant_numbers): %s"  % len(abundant_numbers)
     if len(abundant_numbers) < 100:
         print abundant_numbers
 
-    sum = 0
-    for n in range(max_n):
-        lp.try_print("n: %s" % n)
-        if not is_sum_of_abundant_numbers(n, abundant_numbers):
-           sum += n
 
-    #candidates = range(max_n)
-    #for index, n in enumerate(abundant_numbers):
-        #for m in abundant_numbers[index:]:
-            #local_sum = n + m
-            #if local_sum > max_n:
-                #break
+    pool = multiprocessing.Pool(processes=cpu_count)
+    work_units = [(abundant_numbers, n) for n in divide_array(range(max_n), cpu_count * 2)]
+    #~ find_sumands(work_units[0])
+    watch = StopWatch()
+    map_results = pool.map(find_sumands, work_units)
+    watch.print_time("Map")
 
-            #if local_sum in candidates:
-                #lp.try_print("%s + %s = %s, removed, left: %s" % (n, m, local_sum, len(candidates)))
-                #candidates.remove(local_sum)
+    sum = reduce(lambda x, y: x + y, map_results)
 
-    #print "len(candidates): %s" % len(candidates)
-    #sum = reduce(lambda x, y: x + y, candidates)
+    #~ sum = 0
+    #~ for n in range(max_n):
+        #~ lp.try_print("n: %s" % n)
+        #~ if not is_sum_of_abundant_numbers(n, abundant_numbers):
+           #~ sum += n
+
+    total_watch.print_time("Total")
 
     print "Anwser: %s" % sum
     # correct answer: 4179871
@@ -156,19 +185,6 @@ def main():
 
 
 if __name__ == '__main__':
-    an = [12, 18, 20, 24, 30, 36, 40, 42, 48, 54, 56, 60, 66, 70, 72, 78, 80, 84, 88, 90, 96]
-    #~ print "foo: %s" % is_sum_of_abundant_numbers(30, an)
-
-
     failures, cnt_tests = doctest.testmod()
     if failures == 0:
         main()
-        #~ for n in xrange(1, max_n):
-            #~ if is_abundant(n) != is_abundant_naive(n):
-                #~ print "is_abundant(%s): %s, is_abundant_naive(%s): %s" % (n, is_abundant(n), n, is_abundant_naive(n))
-                #~ break
-
-        ##~ foo = [x for x in gen_primes(28123, primes)]
-        ##~ print len(foo)
-        ##~ print foo[:10]
-        ##~ pass
