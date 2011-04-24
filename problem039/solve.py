@@ -1,5 +1,8 @@
 import doctest
+import math
 from euler_tools.misc import StopWatch
+
+max_perimeter = 1001
 
 def cnt_solutions(perimeter):
     """
@@ -7,8 +10,8 @@ def cnt_solutions(perimeter):
         3
     """
     retval = 0
-    for a in range(1, perimeter):
-        for b in range(a + 1, perimeter):
+    for a in range(1, perimeter / 2):
+        for b in range(a + 1, perimeter / 2):
             c = perimeter - a -b
             if a ** 2 + b ** 2 == c ** 2:
                 #~ print "%s^2 * %s^2 = %s^2" % (a, b, c)
@@ -32,6 +35,8 @@ def main():
             max_length = length
 
     watch.print_time()
+
+    # 840 -> 8
     
 if __name__ == '__main__':
     doctest.testmod()
